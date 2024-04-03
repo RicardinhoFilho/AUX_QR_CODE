@@ -62,7 +62,7 @@ namespace Pix_Desktop.Services.Pdf.IPTU
                         }
                         else
                         {
-                            var req = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                            var req = WebRequest.Create($"https://chart.googleapis.com/chart?chs=80x80&cht=qr&chl={this.model[count].Pix}");
                             using (Stream inputImageStream = req.GetResponse().GetResponseStream())
                             {
                                 Image image = Image.GetInstance(inputImageStream);
@@ -76,7 +76,7 @@ namespace Pix_Desktop.Services.Pdf.IPTU
                             {
                                 try
                                 {
-                                    var req2 = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                                    var req2 = WebRequest.Create($"https://chart.googleapis.com/chart?chs=80x80&cht=qr&chl={this.model[count].Pix}");
                                     using (Stream inputImageStream2 = req2.GetResponse().GetResponseStream())
                                     {
                                         Image image2 = Image.GetInstance(inputImageStream2);
@@ -97,7 +97,7 @@ namespace Pix_Desktop.Services.Pdf.IPTU
                             {
                                 try
                                 {
-                                    var req2 = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                                    var req2 = WebRequest.Create($"https://chart.googleapis.com/chart?chs=80x80&cht=qr&chl={this.model[count].Pix}");
                                     using (Stream inputImageStream2 = req2.GetResponse().GetResponseStream())
                                     {
                                         Image image2 = Image.GetInstance(inputImageStream2);
