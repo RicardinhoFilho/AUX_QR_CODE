@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import QRCode from 'qrcode';
 import path from 'path';
+import fs from 'fs';
 
 const router = Router();
 
@@ -16,16 +17,22 @@ router.get('/qr-code', async (req: Request, res: Response) => {
   }
 
   try {
-    // Gerar o QR code
-    const qrCodeStream = QRCode.toFileStream(texto);
-
     // Definir o caminho onde o arquivo temporário será salvo
-    const filePath = path.join(__dirname, 'temp', 'qrcode.png');
+    const tempDir = path.join(__dirname, 'temp');
+    const filePath = path.join(tempDir, 'qrcode.png');
 
-    // Pipe o stream do QR code para um arquivo temporário
-    qrCodeStream.pipe(res);
+    // Verificar se a pasta temporária existe, senão, criá-la
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir);
+    }
 
-    qrCodeStream.on('end', () => {
+    // Criar um stream de gravação para o arquivo temporário
+    const qrCodeStream = fs.createWriteStream(filePath);
+
+    // Gerar o QR code e escrevê-lo no stream
+    QRCode.toFileStream(qrCodeStream, texto);
+
+    qrCodeStream.on('finish', () => {
       // Enviar o arquivo PNG como resposta
       res.sendFile(filePath, {}, (err) => {
         if (err) {
