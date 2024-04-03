@@ -1,0 +1,134 @@
+
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Sinsoft_Pix.Model;
+using Sinsoft_Pix.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Pix_Desktop.Services.Pdf.IPTU
+{
+    public class IptuBarracaoPdf
+    {
+        private readonly List<PixModel> model;
+
+        public IptuBarracaoPdf(List<PixModel> model)
+        {
+            this.model = model;
+            Execute();
+        }
+
+        public void Execute()
+        {
+            AdicionaQRCode();
+        }
+
+        public void AdicionaQRCode()
+        {
+            Document document = new Document();
+            PdfReader reader = new PdfReader(this.model[0].Carne);
+            try
+            {
+                using (PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(this.model[0].Carne.ToLower().Replace(".pdf", "-pix.pdf"), FileMode.Create)))
+                {
+                    document.Open();
+                    PdfContentByte cb = writer.DirectContent;
+
+                    int count = 0;
+                    for (int pageNumber = 1; pageNumber < reader.NumberOfPages + 1; pageNumber++)
+                    {
+                        count = (pageNumber - 1);
+                        document.SetPageSize(reader.GetPageSizeWithRotation(1));
+                        document.NewPage();
+
+                        if (pageNumber == 1)
+                        {
+                            Chunk fileRef = new Chunk(" ");
+                            fileRef.SetLocalDestination(this.model[0].Carne);
+                            document.Add(fileRef);
+                        }
+
+                        PdfImportedPage page = writer.GetImportedPage(reader, pageNumber);
+                        int rotation = reader.GetPageRotation(pageNumber);
+                        if (rotation == 90 || rotation == 270)
+                        {
+                            cb.AddTemplate(page, 0, -1f, 1f, 0, 0, reader.GetPageSizeWithRotation(pageNumber).Height);
+                        }
+                        else
+                        {
+                            var req = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                            using (Stream inputImageStream = req.GetResponse().GetResponseStream())
+                            {
+                                Image image = Image.GetInstance(inputImageStream);
+                                image.ScaleAbsolute(80, 80);
+                                image.SetAbsolutePosition(350, 575);
+                                cb.AddTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                                cb.AddImage(image);
+                            }
+
+                            //if (this.model.Count > count + 1)
+                            {
+                                try
+                                {
+                                    var req2 = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                                    using (Stream inputImageStream2 = req2.GetResponse().GetResponseStream())
+                                    {
+                                        Image image2 = Image.GetInstance(inputImageStream2);
+                                        image2.ScaleAbsolute(80, 80);
+                                        image2.SetAbsolutePosition(350, 300);
+                                        cb.AddTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                                        cb.AddImage(image2);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                    cb.AddTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                                }
+                            }
+
+                            //if (this.model.Count > count + 2)
+                            {
+                                try
+                                {
+                                    var req2 = WebRequest.Create($"https://solucoes.sinsoft.com.br/api/qrcode/qr-code/?text={this.model[count].Pix}");
+                                    using (Stream inputImageStream2 = req2.GetResponse().GetResponseStream())
+                                    {
+                                        Image image2 = Image.GetInstance(inputImageStream2);
+                                        image2.ScaleAbsolute(80, 80);
+                                        image2.SetAbsolutePosition(350, 12);
+                                        cb.AddTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                                        cb.AddImage(image2);
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e.Message);
+                                    cb.AddTemplate(page, 1f, 0, 0, 1f, 0, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                document.Close();
+                reader.Close();
+            }
+            
+
+           
+        }
+    }
+}
