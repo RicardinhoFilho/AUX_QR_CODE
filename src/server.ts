@@ -17,4 +17,4 @@ app.use(
 
 app.use(router);
 
-app.listen(10000, () => console.log("Server started at http://localhost:10000"));
+app.listen(59, () => console.log("Server started at http://localhost:59"));

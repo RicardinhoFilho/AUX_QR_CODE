@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+</head>
+<body>
+    <div id="qrcode"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
+    <script>
+        // Função para gerar um QR code a partir de uma string
+        function generateQRCode(text) {
+            // Cria um novo QRCode com a string fornecida
+            var typeNumber = 0;
+            var errorCorrectionLevel = 'L';
+            var qr = qrcode(typeNumber, errorCorrectionLevel);
+            qr.addData(text);
+            qr.make();
+
+            // Obtém a representação em SVG do QR code
+            var svg = qr.createSvgTag({
+                cellSize: 4,
+                margin: 1,
+                title: text
+            });
+
+            // Insere o SVG no elemento HTML
+            var qrcodeDiv = document.getElementById('qrcode');
+            qrcodeDiv.innerHTML = svg;
+        }
+
+        // Extrai o parâmetro 'text' da URL
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Obtém o texto do parâmetro 'text' da URL e gera o QR code
+        var textParam = getParameterByName('text');
+        if (textParam) {
+            generateQRCode(textParam);
+        }
+    </script>
+</body>
+</html>
