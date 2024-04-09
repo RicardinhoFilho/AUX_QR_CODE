@@ -1,4 +1,4 @@
-import { Request, Response, Router } from "express";
+import { Request, Response, Router, text } from "express";
 import QRCode from 'qrcode';
 import path from 'path';
 import fs from 'fs';
@@ -52,6 +52,13 @@ router.get('/qr-code', async (req: Request, res: Response) => {
       message: "Erro ao gerar o QR code."
     });
   }
+});
+
+
+router.get('/pague-pix-logo', async (req: Request, res: Response) => {
+  
+  
+  return res.sendFile(path.join(__dirname, 'assets/pague_com_pix'));
 });
 
 export default router;
