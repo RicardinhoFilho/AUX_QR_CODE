@@ -58,7 +58,7 @@ router.get('/qr-code', async (req: Request, res: Response) => {
 router.get('/pague-pix-logo', async (req: Request, res: Response) => {
   
   
-  return res.sendFile(path.join(__dirname, 'assets/pague_com_pix'));
+  return res.sendFile(path.join(__dirname, 'assets/pague_com_pix.jpg'));
 });
 
 export default router;
